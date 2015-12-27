@@ -1,0 +1,3 @@
+node_modules
+nativescript-sectioned-list-view/*.js
+observable-sectioned-array/*.js

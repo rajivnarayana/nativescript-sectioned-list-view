@@ -1,0 +1,13 @@
+{
+  "nativescript": {
+    "id": "org.nativescript.Sample",
+    "tns-ios": {
+      "version": "1.5.1"
+    }
+  },
+  "dependencies": {
+    "nativescript-sectioned-list-view": "file:../nativescript-sectioned-list-view",
+    "observable-sectioned-array": "file:../observable-sectioned-array",
+    "tns-core-modules": "1.5.1"
+  }
+}

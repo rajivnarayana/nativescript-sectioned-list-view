@@ -1,0 +1,7 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" xmlns:tools="nativescript-sectioned-list-view">
+  <tools:ListView items="{{items}}" rowHeight="44">
+  	<tools:ListView.itemTemplate>
+  		<Label text="{{name}}" />
+  	</tools:ListView.itemTemplate>
+  </tools:ListView>
+</Page>
