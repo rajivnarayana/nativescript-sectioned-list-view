@@ -1,6 +1,6 @@
 import { ChangeType } from "data/observable-array";
 import { Observable } from "data/observable";
-import { ObservableSectionArray as IObservableSectionArray, ChangedData } from "observable-sectioned-array";
+import { ObservableSectionArray as IObservableSectionArray, ChangedData, GroupedArray } from "observable-sectioned-array";
 export class ObservableSectionArray<T> extends Observable implements IObservableSectionArray<T> {
     
     private _data : Array<Array<T>>;
@@ -98,9 +98,21 @@ export class ObservableSectionArray<T> extends Observable implements IObservable
         });
     }
     
-    push(items: T[], section:number = 0): number {
+    push(): number {
+        let section: number = 0;
+        let items: Array<T> = [];
         
+        if ( arguments.length >= 1 && Array.isArray(arguments[0])) {
+            items = <Array<T>>arguments[0];
+            if (arguments.length > 1) {
+                section = arguments[1] || section;
+            }
+        } else if ( arguments.length > 1 && Array.isArray(arguments[1])){
+            section = arguments[0] || section;
+            items = <Array<T>>arguments[1];
+        }
         this._addArgs.row = this._data[section].length;
+        this._addArgs.section = section;
         for(let i=0; i<items.length; i++) {
             this._data[section].push(items[i]); 
         }
@@ -110,7 +122,7 @@ export class ObservableSectionArray<T> extends Observable implements IObservable
         return this._data[section].length;
     }
 
-    forEach(callbackfn: (value: T, row: number, section: number, array: definition.GroupedArray<T>) => void, thisArg: any = undefined): void {
+    forEach(callbackfn: (value: T, row: number, section: number, array: GroupedArray<T>) => void, thisArg: any = undefined): void {
         for(let section: number = 0; section< this._data.length; section++) {
             for( let row: number= 0; row< this._data[section].length; row++) {
                 callbackfn.apply(thisArg, [this._data[section][row], section, row, this]);

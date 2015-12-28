@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "typings": "observable-sectioned-array.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rajivnarayana/nativescript-sectioned-list-view.git"
@@ -13,7 +14,7 @@
   "keywords": [
     "nativescript",
     "{N}",
-    "observables",
+    "observable",
     "observable-array",
     "sections"
   ],

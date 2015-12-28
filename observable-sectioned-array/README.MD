@@ -1,9 +1,26 @@
-var sectionedListViewModule = require("nativescript-sectioned-list-view");
+# Observable sectioned array.
+
+A nativescript plugin to use sections of items for data binding.  This can be used alongside [Sectioned List View](https://npmjs.com/package/nativescript-sectioned-list-view) to support sections.
+
+## Installation
+
+Run the following command from the root of your project
+
+```
+$ tns plugin add observable-sectioned-array
+```
+This command automatically installs the necessary files, as well as stores observable-sectioned-array as a dependency in your project's `package.json` file.
+
+## Examples
+
+Following code imports the module
+```js
 var observableSectionArrayModule = require("observable-sectioned-array");
+```
 
-function pageLoaded(args) {
-    var page = args.object;
-
+Following code creates an array and adds sections to it.
+ 
+```js
     var students = [
     	{"name" : "Alice", gender:"female"},
     	{"name": "Adam", gender: "male"},
@@ -21,8 +38,12 @@ function pageLoaded(args) {
     sectionedArray.addSection("Girls", girls);
 
     sectionedArray.on(observableSectionArrayModule.ObservableSectionArray.CHANGE, function (args) {
+        //Fired when we add "Eve" below.
     	console.log("Event name: " + args.eventName + ", action: " + args.action);
+        //Event name: change, action: add
+        
     	console.log("args.row: " + args.row + ", args.section: " + args.section + ", added count: "+args.addedCount);
+        //args.row: 2, args.section: null, added count: 1
 	});
 
 	console.log('No of sections: ' + sectionedArray.getNoOfSections());
@@ -36,26 +57,7 @@ function pageLoaded(args) {
 
     //Now add a new student "Eve" to girls after some delay. 
     setTimeout(function() {
-    	//Notice how pushing new item to section array reloads the view and adds Eve as a new row.
     	sectionedArray.push([{"name": "Eve", gender:"female"}], 1);
     }, 3000);
-
-	page.bindingContext = {items: sectionedArray};    
-
-    // page.bindingContext = {items:{
-    // 	getTitle: function(section) { return "Section "+section;},
-    // 	getNoOfSections: function() { return 2;}, 
-    // 	getNoOfItemsInSection: function(section) {return 3;}, 
-    // 	getItem: function(row, section) { return "Item {"+row+", "+section+"}";}
-    // }};
-
-    // page.bindingContext = {
-    // 	items : {
-    // 		length : 10,
-    // 		getItem : function(row) {
-    // 			return "Item "+row;
-    // 		}
-    // 	}
-    // }
-}
-exports.pageLoaded = pageLoaded;
+    
+```

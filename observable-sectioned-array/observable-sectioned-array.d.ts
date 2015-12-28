@@ -1,6 +1,6 @@
 declare module "observable-sectioned-array" {
     
-    import { EventData } from "data/observable";
+    import { EventData, Observable } from "data/observable";
     
     /**
      * Event args for "changed" event.
