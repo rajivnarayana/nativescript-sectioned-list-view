@@ -129,4 +129,22 @@ export class ObservableSectionArray<T> extends Observable implements IObservable
             }
         }
     }
+    
+    /**
+     * Will notify that the first section has changed.
+     */
+    reset() : void {
+        this._titles = [];
+        let firstSectionItems = this._data[0];
+        this._data = []; 
+        this.notify({
+            eventName: ObservableSectionArray.CHANGE,
+            object: this,
+            action: ChangeType.Delete,
+            row: 0,
+            section: 0,
+            removed: firstSectionItems,
+            addedCount: 1
+        });
+    }
 }

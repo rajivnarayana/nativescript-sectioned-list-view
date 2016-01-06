@@ -127,5 +127,10 @@ declare module "observable-sectioned-array" {
          * Raised when a change occurs.
          */
         on(event: "change", callback: (args: ChangedData<T>) => void, thisArg?: any);
+        
+        /**
+         * Removes all sections and data added previously.
+         */
+        reset();
     }
 }

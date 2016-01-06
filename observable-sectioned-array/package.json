@@ -1,6 +1,6 @@
 {
   "name": "observable-sectioned-array",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A observable array which has sections of items",
   "main": "observable-sectioned-array.js",
   "scripts": {
