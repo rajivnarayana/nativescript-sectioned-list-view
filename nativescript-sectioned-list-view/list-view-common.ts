@@ -11,13 +11,16 @@ import * as weakEventsModule from "ui/core/weak-event-listener";
 
 var ITEMS = "items";
 var ITEMTEMPLATE = "itemTemplate";
+var HEADER_TEMPLATE = "headerTemplate";
 var ISSCROLLING = "isScrolling";
 var LISTVIEW = "ListView";
 var SEPARATORCOLOR = "separatorColor";
 var ROWHEIGHT = "rowHeight";
+var HEADER_HEIGHT = "headerHeight";
 
 export module knownTemplates {
     export var itemTemplate = "itemTemplate";
+    export var headerTemplate = "headerTemplate";
 }
 
 function onItemsPropertyChanged(data: dependencyObservable.PropertyChangeData) {
@@ -37,6 +40,7 @@ function onRowHeightPropertyChanged(data: dependencyObservable.PropertyChangeDat
 
 export class ListView extends view.View implements definition.ListView {
     public static itemLoadingEvent = "itemLoading";
+    public static headerLoadingEvent = "headerLoading";
     public static itemTapEvent = "itemTap";
     public static loadMoreItemsEvent = "loadMoreItems";
 
@@ -64,7 +68,16 @@ export class ListView extends view.View implements definition.ListView {
             onItemTemplatePropertyChanged
             )
         );
-
+    public static headerTemplateProperty = new dependencyObservable.Property(
+        HEADER_TEMPLATE,
+        LISTVIEW,
+        new proxy.PropertyMetadata(
+            undefined,
+            dependencyObservable.PropertyMetadataSettings.AffectsLayout,
+            onItemTemplatePropertyChanged
+            )
+        );
+        
     public static isScrollingProperty = new dependencyObservable.Property(
         ISSCROLLING,
         LISTVIEW,
@@ -83,6 +96,16 @@ export class ListView extends view.View implements definition.ListView {
             onRowHeightPropertyChanged
             )
     );
+    
+    public static headerHeightProperty = new dependencyObservable.Property(
+        HEADER_HEIGHT,
+        LISTVIEW,
+        new proxy.PropertyMetadata(
+            28,
+            dependencyObservable.PropertyMetadataSettings.AffectsLayout,
+            onRowHeightPropertyChanged
+            )
+    );
 
     get items(): any {
         return this._getValue(ListView.itemsProperty);
@@ -96,6 +119,13 @@ export class ListView extends view.View implements definition.ListView {
     }
     set itemTemplate(value: string | view.Template) {
         this._setValue(ListView.itemTemplateProperty, value);
+    }
+    
+    get headerTemplate(): string | view.Template {
+        return this._getValue(ListView.headerTemplateProperty);
+    }
+    set headerTemplate(value: string | view.Template) {
+        this._setValue(ListView.headerTemplateProperty, value);
     }
 
     get isScrolling(): boolean {
@@ -119,6 +149,14 @@ export class ListView extends view.View implements definition.ListView {
     set rowHeight(value: number) {
         this._setValue(ListView.rowHeightProperty, value);
     }
+    
+    get headerHeight(): number {
+        return this._getValue(ListView.headerHeightProperty);
+    }
+    
+    set headerHeight(value : number) {
+        this._setValue(ListView.headerHeightProperty, value);
+    }
 
     public refresh() {
         //
@@ -139,10 +177,33 @@ export class ListView extends view.View implements definition.ListView {
 
         return v;
     }
+    
+    public _getHeaderTemplateContent(section:number =0): view.View {
+        var v;
+
+        if (this.headerTemplate) {
+            var builder : typeof builderModule = require("ui/builder");
+
+            v = builder.parse(this.headerTemplate, this);
+        }
+
+        return v;
+    }
 
     public _prepareItem(item: view.View, row: number, section: number) {
         if (item) {
             var dataItem = this._getDataItem(row, section);
+            if (!(dataItem instanceof observable.Observable)) {
+                item.bindingContext = null;
+            }
+            item.bindingContext = dataItem;
+            item._inheritProperties(this);
+        }
+    }
+    
+    public _prepareHeader(item: view.View, section: number) {
+        if (item) {
+            var dataItem = this._getHeaderItem(section);
             if (!(dataItem instanceof observable.Observable)) {
                 item.bindingContext = null;
             }
@@ -157,8 +218,26 @@ export class ListView extends view.View implements definition.ListView {
         }
         return this.items.getItem ? this.items.getItem(row) : this.items[row];
     }
+    
+    private _getHeaderItem(section: number) : any {
+        if (this.items && this.items.getTitle) {
+            return this.items.getTitle(section);
+        }
+        return "";
+    }
 
     public _getDefaultItemContent(row: number, section:number = 0): view.View {
+        var label: typeof labelModule = require("ui/label");
+
+        var lbl = new label.Label();
+        lbl.bind({
+            targetProperty: "text",
+            sourceProperty: "$value"
+        });
+        return lbl;
+    }
+    
+    public _getDefaultHeaderContent(row: number, section:number = 0): view.View {
         var label: typeof labelModule = require("ui/label");
 
         var lbl = new label.Label();

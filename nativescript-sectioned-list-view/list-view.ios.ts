@@ -6,9 +6,15 @@ import view = require("ui/core/view");
 import proxy = require("ui/core/proxy");
 import dependencyObservable = require("ui/core/dependency-observable");
 import * as colorModule from "color";
+import { Label } from "ui/label";
+import { FormattedString } from "text/formatted-string";
+import { Span } from "text/span";
+import { FontAttributes } from "ui/enums";
 
 var CELLIDENTIFIER = "cell";
+var HEADERIDENTIFIER = "header";
 var ITEMLOADING = common.ListView.itemLoadingEvent;
+var HEADERLOADING = common.ListView.headerLoadingEvent;
 var LOADMOREITEMS = common.ListView.loadMoreItemsEvent;
 var ITEMTAP = common.ListView.itemTapEvent;
 var DEFAULT_HEIGHT = 44;
@@ -35,8 +41,33 @@ class ListViewCell extends UITableViewCell {
     public owner: WeakRef<view.View>;
 }
 
+class ListViewHeaderView extends UITableViewHeaderFooterView {
+    
+    public willMoveToSuperview(newSuperview: UIView): void {
+        let parent: ListView = <ListView>(this.view ? this.view.parent : null);
+
+        // When inside ListView and there is no newSuperview this cell is 
+        // removed from native visual tree so we remove it from our tree too.
+        if (parent && !newSuperview) {
+            parent._removeContainer(this);
+        }
+    }
+    
+    public get view(): view.View {
+        return this.owner ? this.owner.get() : null
+    }
+
+    public owner: WeakRef<view.View>;
+}
+
 function notifyForItemAtIndex(listView: definition.ListView, cell: any, view: view.View, eventName: string, indexPath: NSIndexPath) {
     let args = <definition.ItemEventData>{ eventName: eventName, object: listView, row: indexPath.row, section: indexPath.section, view: view, ios: cell, android: undefined };
+    listView.notify(args);
+    return args;
+}
+
+function notifyForHeaderAtSection(listView: definition.ListView, header: any, view: view.View, eventName: string, section: number) {
+    let args = <definition.ItemEventData>{ eventName: eventName, object: listView, row: 0, section: section, view: view, ios: header, android: undefined };
     listView.notify(args);
     return args;
 }
@@ -86,14 +117,6 @@ class DataSource extends NSObject implements UITableViewDataSource {
             }
         }
         return cell;
-    }
-    
-    public tableViewTitleForHeaderInSection(tableView:UITableView, section: number) {
-        let owner = this._owner.get();
-        if (owner && owner.items && owner.items.getTitle) {
-            return owner.items.getTitle(section);
-        }
-        return "";
     }
 }
 
@@ -191,6 +214,30 @@ class UITableViewRowHeightDelegateImpl extends NSObject implements UITableViewDe
         }
 
         return owner.rowHeight;
+    }
+    
+    public tableViewViewForHeaderInSection(tableView:UITableView, section: number) {
+        
+        let headerView = <ListViewHeaderView>(tableView.dequeueReusableHeaderFooterViewWithIdentifier(HEADERIDENTIFIER) || ListViewHeaderView.new());
+        let owner = this._owner.get();
+        if (owner) {
+            owner._prepareHeaderView(headerView, section);
+
+            let cellView: view.View = headerView.view;
+            if (cellView) {
+                // Arrange cell views. We do it here instead of _layoutCell because _layoutCell is called 
+                // from 'tableViewHeightForRowAtIndexPath' method too (in iOS 7.1) and we don't want to arrange the fake cell.
+                let width = utils.layout.getMeasureSpecSize(owner.widthMeasureSpec);
+                let headerHeight = owner.headerHeight;
+                view.View.layoutChild(owner, cellView, 0, 0, width, headerHeight);
+            }
+        }
+        return headerView;
+    }
+    
+    public tableViewHeightForHeaderInSection(tableView:UITableView, section: number) {
+        let owner = this._owner.get();
+        return owner.headerHeight;
     }
 }
 
@@ -326,7 +373,7 @@ export class ListView extends common.ListView {
 
         try {
             this._preparingCell = true;
-            let view = cell.view;
+            let view : view.View = cell.view;
             if (!view) {
                 view = this._getItemTemplateContent(indexPath.row, indexPath.section);
             }
@@ -359,9 +406,56 @@ export class ListView extends common.ListView {
         }
         return cellHeight;
     }
+    
+    public _prepareHeaderView(headerView: ListViewHeaderView, section: number) : void {
+        let view = headerView.view;
+        if (!view) {
+            view = this._getHeaderTemplateContent(section);
+        }
+        
+        let args = notifyForHeaderAtSection(this, headerView, view, HEADERLOADING, section);
+        view = args.view;
+        if (!view) {
+            let defaultContent = this._getDefaultHeaderContent(section);
+            defaultContent.marginLeft = this.ios.separatorInset.left;
+            view = defaultContent;
+        }
+        
+        if (!headerView.view) {
+            headerView.owner = new WeakRef(view);
+        }
+        else if (headerView.view !== view) {
+            this._removeContainer(headerView);
+            (<UIView>headerView.view._nativeView).removeFromSuperview();
+            headerView.owner = new WeakRef(view);
+        }
+
+        this._prepareHeader(view, section);
+        this._map.set(headerView, view);//ignore this warning for now. Rajiv.
+        // We expect that views returned from itemLoading are new (e.g. not reused).
+        if (view && !view.parent && view._nativeView) {
+            headerView.contentView.addSubview(view._nativeView);
+            this._addView(view);
+        }
+    }
 
     public _removeContainer(cell: ListViewCell): void {
         this._removeView(cell.view)
         this._map.delete(cell);
+    }
+    
+    public _getDefaultHeaderContent(row: number, section:number = 0): view.View {
+        var lbl = new Label();
+        let formattedString = new FormattedString();
+        let span = new Span();
+        span.fontSize = 16;
+        span.bind({
+            targetProperty: "text",
+            sourceProperty: "$value"
+        });
+        span.fontAttributes = FontAttributes.Bold;
+        formattedString.spans.push(span);
+        lbl.formattedText = formattedString;
+        return lbl;
     }
 }

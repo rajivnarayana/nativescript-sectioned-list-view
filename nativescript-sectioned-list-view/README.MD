@@ -8,6 +8,10 @@ However, use a [Sectioned Array](https://www.npmjs.com/package/observable-sectio
 $ tns plugin add nativescript-sectioned-list-view
 ```
 
+# Section Templating
+
+There is also support to template the headers, height of the header etc.
+
 # Usage
 In xml
 ```xml
@@ -19,6 +23,18 @@ In xml
   	</tools:ListView.itemTemplate>
   </tools:ListView>
 </Page>
+```
+
+Make the section header blue.
+```xml
+<tools:ListView items="{{items}}" rowHeight="44" headerHeight="44">
+    <tools:ListView.itemTemplate>
+        <Label text="{{name}}" />
+    </tools:ListView.itemTemplate>
+    <tools:ListView.headerTemplate>
+        <Label text="{{$value}}" style="color: blue"/>
+    </tools:ListView.headerTemplate>
+</tools:ListView>
 ```
 
 Use a static array in your javascript

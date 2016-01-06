@@ -38,6 +38,11 @@ declare module "nativescript-sectioned-list-view" {
          * Represents the observable property backing the items property of each ListView instance.
          */
         public static itemsProperty: Property;
+        
+        /**
+         * Represents the item template property of section header instance.
+         */
+        public static headerTemplateProperty: Property;
 
         /**
          * Represents the item template property of each ListView instance.
@@ -53,6 +58,11 @@ declare module "nativescript-sectioned-list-view" {
          * Represents the observable property backing the rowHeight property of each ListView instance.
          */
         public static rowHeightProperty: Property;
+        
+        /**
+         * Represents the observable property backing the headerHeight property of each section.
+         */
+        public static headerHeightProperty: Property;
 
         /**
          * Gets the native [android widget](http://developer.android.com/reference/android/widget/ListView.html) that represents the user interface for this component. Valid only when running on Android OS.
@@ -90,6 +100,11 @@ declare module "nativescript-sectioned-list-view" {
          */
         rowHeight: number;
 
+        /**
+         * Gets or sets the header height of each section header of the ListView.
+         */
+        headerHeight: number;
+        
         /**
          * Forces the ListView to reload all its items.
          */
