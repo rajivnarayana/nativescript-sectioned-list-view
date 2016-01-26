@@ -1,6 +1,6 @@
 {
   "name": "observable-sectioned-array",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A observable array which has sections of items",
   "main": "observable-sectioned-array.js",
   "scripts": {
@@ -24,8 +24,8 @@
     "url": "https://github.com/rajivnarayana/nativescript-sectioned-list-view/issues"
   },
   "homepage": "https://github.com/rajivnarayana/nativescript-sectioned-list-view#readme",
-  "dependencies": {
-    "tns-core-modules": "^1.5.1"
+  "devDependencies": {
+    "tns-core-modules": "^1.5.2"
   },
   "nativescript" : {
       "platforms" : {

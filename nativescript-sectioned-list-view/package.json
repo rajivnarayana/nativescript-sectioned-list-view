@@ -1,6 +1,6 @@
 {
   "name": "nativescript-sectioned-list-view",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A native script listview plugin that can display sections",
   "main": "list-view.js",
   "scripts": {
@@ -24,8 +24,8 @@
     "url": "https://github.com/rajivnarayana/nativescript-sectioned-list-view/issues"
   },
   "homepage": "https://github.com/rajivnarayana/nativescript-sectioned-list-view#readme",
-  "dependencies": {
-    "tns-core-modules": "^1.5.1"
+  "devDependencies": {
+    "tns-core-modules": "^1.5.2"
   },
   "nativescript" : {
       "platforms" : {
