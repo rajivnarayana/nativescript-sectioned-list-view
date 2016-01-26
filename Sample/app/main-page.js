@@ -37,7 +37,8 @@ function pageLoaded(args) {
     //Now add a new student "Eve" to girls after some delay. 
     setTimeout(function() {
     	//Notice how pushing new item to section array reloads the view and adds Eve as a new row.
-    	sectionedArray.push([{"name": "Eve", gender:"female"}], 1);
+    	// sectionedArray.push([{"name": "Eve", gender:"female"}], 1);
+        sectionedArray.reset();
     }, 3000);
 
 	page.bindingContext = {items: sectionedArray};    

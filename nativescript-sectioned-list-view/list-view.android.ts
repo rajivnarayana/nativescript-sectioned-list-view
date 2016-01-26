@@ -9,15 +9,15 @@ import utils = require("utils/utils")
 import * as layoutBaseModule from "ui/layouts/layout-base";
 import * as colorModule from "color";
 
-var ITEMLOADING = common.ListView.itemLoadingEvent;
-var LOADMOREITEMS = common.ListView.loadMoreItemsEvent;
-var ITEMTAP = common.ListView.itemTapEvent;
+var ITEMLOADING = common.SectionedListView.itemLoadingEvent;
+var LOADMOREITEMS = common.SectionedListView.loadMoreItemsEvent;
+var ITEMTAP = common.SectionedListView.itemTapEvent;
 var REALIZED_INDEX = "realizedIndex";
 
 global.moduleMerge(common, exports);
 
 function onSeparatorColorPropertyChanged(data: dependencyObservable.PropertyChangeData) {
-    var bar = <ListView>data.object;
+    var bar = <SectionedListView>data.object;
     if (!bar.android) {
         return;
     }
@@ -31,9 +31,9 @@ function onSeparatorColorPropertyChanged(data: dependencyObservable.PropertyChan
 }
 
 // register the setNativeValue callbacks
-(<proxy.PropertyMetadata>common.ListView.separatorColorProperty.metadata).onSetNativeValue = onSeparatorColorPropertyChanged;
+(<proxy.PropertyMetadata>common.SectionedListView.separatorColorProperty.metadata).onSetNativeValue = onSeparatorColorPropertyChanged;
 
-export class ListView extends common.ListView {
+export class SectionedListView extends common.SectionedListView {
     private _android: android.widget.ListView;
     public _realizedItems = {};
     private _androidViewId: number;
@@ -55,20 +55,20 @@ export class ListView extends common.ListView {
         // TODO: This causes many marshalling calls, rewrite in Java and generate bindings
         this.android.setOnScrollListener(new android.widget.AbsListView.OnScrollListener(<utils.Owned & android.widget.AbsListView.IOnScrollListener>{
             onScrollStateChanged: function (view: android.widget.AbsListView, scrollState: number) {
-                var owner: ListView = this.owner;
+                var owner: SectionedListView = this.owner;
                 if (!owner) {
                     return;
                 }
 
                 if (scrollState === android.widget.AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
-                    owner._setValue(common.ListView.isScrollingProperty, false);
+                    owner._setValue(common.SectionedListView.isScrollingProperty, false);
                     owner._notifyScrollIdle();
                 } else {
-                    owner._setValue(common.ListView.isScrollingProperty, true);
+                    owner._setValue(common.SectionedListView.isScrollingProperty, true);
                 }
             },
             onScroll: function (view: android.widget.AbsListView, firstVisibleItem: number, visibleItemCount: number, totalItemCount: number) {
-                var owner: ListView = this.owner;
+                var owner: SectionedListView = this.owner;
                 if (!owner) {
                     return;
                 }
@@ -159,9 +159,9 @@ export class ListView extends common.ListView {
 }
 
 class ListViewAdapter extends android.widget.BaseAdapter {
-    private _listView: ListView;
+    private _listView: SectionedListView;
 
-    constructor(listView: ListView) {
+    constructor(listView: SectionedListView) {
         super();
 
         this._listView = listView;

@@ -20,7 +20,7 @@ declare module "nativescript-sectioned-list-view" {
     /**
      * Represents a view that shows items in a vertically scrolling list.
      */
-    export class ListView extends View {
+    export class SectionedListView extends View {
         /**
          * String value used when hooking to itemLoading event.
          */

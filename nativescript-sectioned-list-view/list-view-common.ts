@@ -13,7 +13,7 @@ var ITEMS = "items";
 var ITEMTEMPLATE = "itemTemplate";
 var HEADER_TEMPLATE = "headerTemplate";
 var ISSCROLLING = "isScrolling";
-var LISTVIEW = "ListView";
+var LISTVIEW = "SectionedListView";
 var SEPARATORCOLOR = "separatorColor";
 var ROWHEIGHT = "rowHeight";
 var HEADER_HEIGHT = "headerHeight";
@@ -24,21 +24,21 @@ export module knownTemplates {
 }
 
 function onItemsPropertyChanged(data: dependencyObservable.PropertyChangeData) {
-    var listView = <ListView>data.object;
+    var listView = <SectionedListView>data.object;
     listView._onItemsPropertyChanged(data);
 }
 
 function onItemTemplatePropertyChanged(data: dependencyObservable.PropertyChangeData) {
-    var listView = <definition.ListView>data.object;
+    var listView = <definition.SectionedListView>data.object;
     listView.refresh();
 }
 
 function onRowHeightPropertyChanged(data: dependencyObservable.PropertyChangeData) {
-    var listView = <ListView>data.object;
+    var listView = <SectionedListView>data.object;
     listView._onRowHeightPropertyChanged(data);
 }
 
-export class ListView extends view.View implements definition.ListView {
+export class SectionedListView extends view.View implements definition.SectionedListView {
     public static itemLoadingEvent = "itemLoading";
     public static headerLoadingEvent = "headerLoading";
     public static itemTapEvent = "itemTap";
@@ -108,54 +108,54 @@ export class ListView extends view.View implements definition.ListView {
     );
 
     get items(): any {
-        return this._getValue(ListView.itemsProperty);
+        return this._getValue(SectionedListView.itemsProperty);
     }
     set items(value: any) {
-        this._setValue(ListView.itemsProperty, value);
+        this._setValue(SectionedListView.itemsProperty, value);
     }
 
     get itemTemplate(): string | view.Template {
-        return this._getValue(ListView.itemTemplateProperty);
+        return this._getValue(SectionedListView.itemTemplateProperty);
     }
     set itemTemplate(value: string | view.Template) {
-        this._setValue(ListView.itemTemplateProperty, value);
+        this._setValue(SectionedListView.itemTemplateProperty, value);
     }
     
     get headerTemplate(): string | view.Template {
-        return this._getValue(ListView.headerTemplateProperty);
+        return this._getValue(SectionedListView.headerTemplateProperty);
     }
     set headerTemplate(value: string | view.Template) {
-        this._setValue(ListView.headerTemplateProperty, value);
+        this._setValue(SectionedListView.headerTemplateProperty, value);
     }
 
     get isScrolling(): boolean {
-        return this._getValue(ListView.isScrollingProperty);
+        return this._getValue(SectionedListView.isScrollingProperty);
     }
     set isScrolling(value: boolean) {
-        this._setValue(ListView.isScrollingProperty, value);
+        this._setValue(SectionedListView.isScrollingProperty, value);
     }
 
     get separatorColor(): color.Color {
-        return this._getValue(ListView.separatorColorProperty);
+        return this._getValue(SectionedListView.separatorColorProperty);
     }
     set separatorColor(value: color.Color) {
-        this._setValue(ListView.separatorColorProperty,
+        this._setValue(SectionedListView.separatorColorProperty,
             value instanceof color.Color ? value : new color.Color(<any>value));
     }
 
     get rowHeight(): number {
-        return this._getValue(ListView.rowHeightProperty);
+        return this._getValue(SectionedListView.rowHeightProperty);
     }
     set rowHeight(value: number) {
-        this._setValue(ListView.rowHeightProperty, value);
+        this._setValue(SectionedListView.rowHeightProperty, value);
     }
     
     get headerHeight(): number {
-        return this._getValue(ListView.headerHeightProperty);
+        return this._getValue(SectionedListView.headerHeightProperty);
     }
     
     set headerHeight(value : number) {
-        this._setValue(ListView.headerHeightProperty, value);
+        this._setValue(SectionedListView.headerHeightProperty, value);
     }
 
     public refresh() {

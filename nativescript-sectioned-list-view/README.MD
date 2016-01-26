@@ -17,24 +17,24 @@ In xml
 ```xml
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" 
 	xmlns:tools="nativescript-sectioned-list-view">
-  <tools:ListView items="{{items}}" rowHeight="44">
-  	<tools:ListView.itemTemplate>
+  <tools:SectionedListView items="{{items}}" rowHeight="44">
+  	<tools:SectionedListView.itemTemplate>
   		<Label text="{{name}}" />
-  	</tools:ListView.itemTemplate>
-  </tools:ListView>
+  	</tools:SectionedListView.itemTemplate>
+  </tools:SectionedListView>
 </Page>
 ```
 
 Make the section header blue.
 ```xml
-<tools:ListView items="{{items}}" rowHeight="44" headerHeight="44">
-    <tools:ListView.itemTemplate>
+<tools:SectionedListView items="{{items}}" rowHeight="44" headerHeight="44">
+    <tools:SectionedListView.itemTemplate>
         <Label text="{{name}}" />
-    </tools:ListView.itemTemplate>
-    <tools:ListView.headerTemplate>
+    </tools:SectionedListView.itemTemplate>
+    <tools:SectionedListView.headerTemplate>
         <Label text="{{$value}}" style="color: blue"/>
-    </tools:ListView.headerTemplate>
-</tools:ListView>
+    </tools:SectionedListView.headerTemplate>
+</tools:SectionedListView>
 ```
 
 Use a static array in your javascript

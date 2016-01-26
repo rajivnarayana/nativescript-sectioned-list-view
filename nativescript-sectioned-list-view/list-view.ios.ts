@@ -13,19 +13,19 @@ import { FontAttributes } from "ui/enums";
 
 var CELLIDENTIFIER = "cell";
 var HEADERIDENTIFIER = "header";
-var ITEMLOADING = common.ListView.itemLoadingEvent;
-var HEADERLOADING = common.ListView.headerLoadingEvent;
-var LOADMOREITEMS = common.ListView.loadMoreItemsEvent;
-var ITEMTAP = common.ListView.itemTapEvent;
+var ITEMLOADING = common.SectionedListView.itemLoadingEvent;
+var HEADERLOADING = common.SectionedListView.headerLoadingEvent;
+var LOADMOREITEMS = common.SectionedListView.loadMoreItemsEvent;
+var ITEMTAP = common.SectionedListView.itemTapEvent;
 var DEFAULT_HEIGHT = 44;
 
 global.moduleMerge(common, exports);
 
 var infinity = utils.layout.makeMeasureSpec(0, utils.layout.UNSPECIFIED);
 
-class ListViewCell extends UITableViewCell {
+class SectionedListViewCell extends UITableViewCell {
     public willMoveToSuperview(newSuperview: UIView): void {
-        let parent: ListView = <ListView>(this.view ? this.view.parent : null);
+        let parent: SectionedListView = <SectionedListView>(this.view ? this.view.parent : null);
 
         // When inside ListView and there is no newSuperview this cell is 
         // removed from native visual tree so we remove it from our tree too.
@@ -41,10 +41,10 @@ class ListViewCell extends UITableViewCell {
     public owner: WeakRef<view.View>;
 }
 
-class ListViewHeaderView extends UITableViewHeaderFooterView {
+class SectionedListViewHeaderView extends UITableViewHeaderFooterView {
     
     public willMoveToSuperview(newSuperview: UIView): void {
-        let parent: ListView = <ListView>(this.view ? this.view.parent : null);
+        let parent: SectionedListView = <SectionedListView>(this.view ? this.view.parent : null);
 
         // When inside ListView and there is no newSuperview this cell is 
         // removed from native visual tree so we remove it from our tree too.
@@ -60,25 +60,25 @@ class ListViewHeaderView extends UITableViewHeaderFooterView {
     public owner: WeakRef<view.View>;
 }
 
-function notifyForItemAtIndex(listView: definition.ListView, cell: any, view: view.View, eventName: string, indexPath: NSIndexPath) {
+function notifyForItemAtIndex(listView: definition.SectionedListView, cell: any, view: view.View, eventName: string, indexPath: NSIndexPath) {
     let args = <definition.ItemEventData>{ eventName: eventName, object: listView, row: indexPath.row, section: indexPath.section, view: view, ios: cell, android: undefined };
     listView.notify(args);
     return args;
 }
 
-function notifyForHeaderAtSection(listView: definition.ListView, header: any, view: view.View, eventName: string, section: number) {
+function notifyForHeaderAtSection(listView: definition.SectionedListView, header: any, view: view.View, eventName: string, section: number) {
     let args = <definition.ItemEventData>{ eventName: eventName, object: listView, row: 0, section: section, view: view, ios: header, android: undefined };
     listView.notify(args);
     return args;
 }
 
-class DataSource extends NSObject implements UITableViewDataSource {
+class SectionedDataSource extends NSObject implements UITableViewDataSource {
     public static ObjCProtocols = [UITableViewDataSource];
 
-    private _owner: WeakRef<ListView>;
+    private _owner: WeakRef<SectionedListView>;
 
-    public static initWithOwner(owner: WeakRef<ListView>): DataSource {
-        let dataSource = <DataSource>DataSource.new();
+    public static initWithOwner(owner: WeakRef<SectionedListView>): SectionedDataSource {
+        let dataSource = <SectionedDataSource>SectionedDataSource.new();
         dataSource._owner = owner;
         return dataSource;
     }
@@ -101,7 +101,7 @@ class DataSource extends NSObject implements UITableViewDataSource {
 
     public tableViewCellForRowAtIndexPath(tableView: UITableView, indexPath: NSIndexPath): UITableViewCell {
         // We call this method because ...ForIndexPath calls tableViewHeightForRowAtIndexPath immediately (before we can prepare and measure it).
-        let cell = <ListViewCell>(tableView.dequeueReusableCellWithIdentifier(CELLIDENTIFIER) || ListViewCell.new());
+        let cell = <SectionedListViewCell>(tableView.dequeueReusableCellWithIdentifier(CELLIDENTIFIER) || SectionedListViewCell.new());
         let owner = this._owner.get();
         if (owner) {
             owner._prepareCell(cell, indexPath);
@@ -120,14 +120,14 @@ class DataSource extends NSObject implements UITableViewDataSource {
     }
 }
 
-class UITableViewDelegateImpl extends NSObject implements UITableViewDelegate {
+class SectionedTableViewDelegateImpl extends NSObject implements UITableViewDelegate {
     public static ObjCProtocols = [UITableViewDelegate];
 
-    private _owner: WeakRef<ListView>;
-    private _measureCell: ListViewCell;
+    private _owner: WeakRef<SectionedListView>;
+    private _measureCell: SectionedListViewCell;
 
-    public static initWithOwner(owner: WeakRef<ListView>): UITableViewDelegateImpl {
-        let delegate = <UITableViewDelegateImpl>UITableViewDelegateImpl.new();
+    public static initWithOwner(owner: WeakRef<SectionedListView>): SectionedTableViewDelegateImpl {
+        let delegate = <SectionedTableViewDelegateImpl>SectionedTableViewDelegateImpl.new();
         delegate._owner = owner;
         return delegate;
     }
@@ -140,7 +140,7 @@ class UITableViewDelegateImpl extends NSObject implements UITableViewDelegate {
     }
 
     public tableViewWillSelectRowAtIndexPath(tableView: UITableView, indexPath: NSIndexPath): NSIndexPath {
-        let cell = <ListViewCell>tableView.cellForRowAtIndexPath(indexPath);
+        let cell = <SectionedListViewCell>tableView.cellForRowAtIndexPath(indexPath);
         let owner = this._owner.get();
         if (owner) {
             notifyForItemAtIndex(owner, cell, cell.view, ITEMTAP, indexPath);
@@ -169,7 +169,7 @@ class UITableViewDelegateImpl extends NSObject implements UITableViewDelegate {
             // in iOS 7.1 (or iOS8+ after call to scrollToRowAtIndexPath:atScrollPosition:animated:) this method is called before tableViewCellForRowAtIndexPath so we need fake cell to measure its content.
             let cell = this._measureCell;
             if (!cell) {
-                this._measureCell = tableView.dequeueReusableCellWithIdentifier(CELLIDENTIFIER) || ListViewCell.new();
+                this._measureCell = tableView.dequeueReusableCellWithIdentifier(CELLIDENTIFIER) || SectionedListViewCell.new();
                 cell = this._measureCell;
             }
 
@@ -180,13 +180,13 @@ class UITableViewDelegateImpl extends NSObject implements UITableViewDelegate {
     }
 }
 
-class UITableViewRowHeightDelegateImpl extends NSObject implements UITableViewDelegate {
+class SectionedUITableViewRowHeightDelegateImpl extends NSObject implements UITableViewDelegate {
     public static ObjCProtocols = [UITableViewDelegate];
 
-    private _owner: WeakRef<ListView>;
+    private _owner: WeakRef<SectionedListView>;
 
-    public static initWithOwner(owner: WeakRef<ListView>): UITableViewRowHeightDelegateImpl {
-        let delegate = <UITableViewRowHeightDelegateImpl>UITableViewRowHeightDelegateImpl.new();
+    public static initWithOwner(owner: WeakRef<SectionedListView>): SectionedUITableViewRowHeightDelegateImpl {
+        let delegate = <SectionedUITableViewRowHeightDelegateImpl>SectionedUITableViewRowHeightDelegateImpl.new();
         delegate._owner = owner;
         return delegate;
     }
@@ -199,7 +199,7 @@ class UITableViewRowHeightDelegateImpl extends NSObject implements UITableViewDe
     }
 
     public tableViewWillSelectRowAtIndexPath(tableView: UITableView, indexPath: NSIndexPath): NSIndexPath {
-        let cell = <ListViewCell>tableView.cellForRowAtIndexPath(indexPath);
+        let cell = <SectionedListViewCell>tableView.cellForRowAtIndexPath(indexPath);
         let owner = this._owner.get();
         if (owner) {
             notifyForItemAtIndex(owner, cell, cell.view, ITEMTAP, indexPath);
@@ -218,7 +218,7 @@ class UITableViewRowHeightDelegateImpl extends NSObject implements UITableViewDe
     
     public tableViewViewForHeaderInSection(tableView:UITableView, section: number) {
         
-        let headerView = <ListViewHeaderView>(tableView.dequeueReusableHeaderFooterViewWithIdentifier(HEADERIDENTIFIER) || ListViewHeaderView.new());
+        let headerView = <SectionedListViewHeaderView>(tableView.dequeueReusableHeaderFooterViewWithIdentifier(HEADERIDENTIFIER) || SectionedListViewHeaderView.new());
         let owner = this._owner.get();
         if (owner) {
             owner._prepareHeaderView(headerView, section);
@@ -242,7 +242,7 @@ class UITableViewRowHeightDelegateImpl extends NSObject implements UITableViewDe
 }
 
 function onSeparatorColorPropertyChanged(data: dependencyObservable.PropertyChangeData) {
-    var bar = <ListView>data.object;
+    var bar = <SectionedListView>data.object;
     if (!bar.ios) {
         return;
     }
@@ -255,30 +255,30 @@ function onSeparatorColorPropertyChanged(data: dependencyObservable.PropertyChan
 }
 
 // register the setNativeValue callbacks
-(<proxy.PropertyMetadata>common.ListView.separatorColorProperty.metadata).onSetNativeValue = onSeparatorColorPropertyChanged;
+(<proxy.PropertyMetadata>common.SectionedListView.separatorColorProperty.metadata).onSetNativeValue = onSeparatorColorPropertyChanged;
 
-export class ListView extends common.ListView {
+export class SectionedListView extends common.SectionedListView {
     private _ios: UITableView;
     private _dataSource;
     private _delegate;
     private _heights: Array<number>;
     private _preparingCell: boolean = false;
     private _isDataDirty: boolean = false;
-    private _map: Map<ListViewCell, view.View>;
+    private _map: Map<SectionedListViewCell, view.View>;
     widthMeasureSpec: number = 0;
 
     constructor() {
         super();
 
         this._ios = UITableView.new();
-        this._ios.registerClassForCellReuseIdentifier(ListViewCell.class(), CELLIDENTIFIER);
+        this._ios.registerClassForCellReuseIdentifier(SectionedListViewCell.class(), CELLIDENTIFIER);
         this._ios.autoresizingMask = UIViewAutoresizing.UIViewAutoresizingNone;
         this._ios.estimatedRowHeight = DEFAULT_HEIGHT;
         this._ios.rowHeight = UITableViewAutomaticDimension;
-        this._ios.dataSource = this._dataSource = DataSource.initWithOwner(new WeakRef(this));
-        this._delegate = UITableViewDelegateImpl.initWithOwner(new WeakRef(this));
+        this._ios.dataSource = this._dataSource = SectionedDataSource.initWithOwner(new WeakRef(this));
+        this._delegate = SectionedTableViewDelegateImpl.initWithOwner(new WeakRef(this));
         this._heights = new Array<number>();
-        this._map = new Map<ListViewCell, view.View>();
+        this._map = new Map<SectionedListViewCell, view.View>();
     }
 
     public onLoaded() {
@@ -327,12 +327,12 @@ export class ListView extends common.ListView {
         if (data.newValue < 0) {
             this._nativeView.rowHeight = UITableViewAutomaticDimension;
             this._nativeView.estimatedRowHeight = DEFAULT_HEIGHT;
-            this._delegate = UITableViewDelegateImpl.initWithOwner(new WeakRef(this));
+            this._delegate = SectionedTableViewDelegateImpl.initWithOwner(new WeakRef(this));
         }
         else {
             this._nativeView.rowHeight = data.newValue;
             this._nativeView.estimatedRowHeight = data.newValue;
-            this._delegate = UITableViewRowHeightDelegateImpl.initWithOwner(new WeakRef(this));
+            this._delegate = SectionedUITableViewRowHeightDelegateImpl.initWithOwner(new WeakRef(this));
         }
         if (this.isLoaded) {
             this._nativeView.delegate = this._delegate;
@@ -368,7 +368,7 @@ export class ListView extends common.ListView {
         return 0;
     }
 
-    public _prepareCell(cell: ListViewCell, indexPath: NSIndexPath): number {
+    public _prepareCell(cell: SectionedListViewCell, indexPath: NSIndexPath): number {
         let cellHeight: number;
 
         try {
@@ -407,7 +407,7 @@ export class ListView extends common.ListView {
         return cellHeight;
     }
     
-    public _prepareHeaderView(headerView: ListViewHeaderView, section: number) : void {
+    public _prepareHeaderView(headerView: SectionedListViewHeaderView, section: number) : void {
         let view = headerView.view;
         if (!view) {
             view = this._getHeaderTemplateContent(section);
@@ -439,7 +439,7 @@ export class ListView extends common.ListView {
         }
     }
 
-    public _removeContainer(cell: ListViewCell): void {
+    public _removeContainer(cell: SectionedListViewCell): void {
         this._removeView(cell.view)
         this._map.delete(cell);
     }
