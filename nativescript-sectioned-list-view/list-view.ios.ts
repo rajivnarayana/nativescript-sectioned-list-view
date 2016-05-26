@@ -134,7 +134,8 @@ class SectionedTableViewDelegateImpl extends NSObject implements UITableViewDele
 
     public tableViewWillDisplayCellForRowAtIndexPath(tableView: UITableView, cell: UITableViewCell, indexPath: NSIndexPath) {
         let owner = this._owner.get();
-        if (owner && (indexPath.row === owner.items.length - 1)) {
+        console.log('Will display cell for row at indexpath');
+        if (owner && (indexPath.section == owner.items.getNoOfSections() - 1) && (indexPath.row === owner.items.getNoOfItemsInSection(indexPath.section) - 1)) {
             owner.notify(<observable.EventData>{ eventName: LOADMOREITEMS, object: owner });
         }
     }
@@ -193,7 +194,7 @@ class SectionedUITableViewRowHeightDelegateImpl extends NSObject implements UITa
 
     public tableViewWillDisplayCellForRowAtIndexPath(tableView: UITableView, cell: UITableViewCell, indexPath: NSIndexPath) {
         let owner = this._owner.get();
-        if (owner && (indexPath.row === owner.items.length - 1)) {
+        if (owner && (indexPath.section == owner.items.getNoOfSections() - 1) && (indexPath.row === owner.items.getNoOfItemsInSection(indexPath.section) - 1)) {
             owner.notify(<observable.EventData>{ eventName: LOADMOREITEMS, object: owner });
         }
     }

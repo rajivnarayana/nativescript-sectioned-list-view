@@ -1,5 +1,5 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" loaded="pageLoaded" xmlns:tools="nativescript-sectioned-list-view">
-  <tools:SectionedListView items="{{items}}" rowHeight="44" headerHeight="44">
+  <tools:SectionedListView items="{{items}}" rowHeight="44" headerHeight="44" loadMoreItems="onLoadMoreItems">
   	<tools:SectionedListView.itemTemplate>
   		<Label text="{{name}}" />
   	</tools:SectionedListView.itemTemplate>

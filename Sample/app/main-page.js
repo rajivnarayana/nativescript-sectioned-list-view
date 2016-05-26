@@ -60,3 +60,7 @@ function pageLoaded(args) {
     // }
 }
 exports.pageLoaded = pageLoaded;
+
+exports.onLoadMoreItems = function() {
+    console.log('Reached end of list. Time to load more items!');
+}
